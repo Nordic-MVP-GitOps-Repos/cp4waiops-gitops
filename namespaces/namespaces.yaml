@@ -12,7 +12,7 @@ spec:
   source:
     repoURL: https://github.com/Nordic-MVP-GitOps-Repos/cp4waiops-gitops 
     path: namespaces/resources
-    targetRevision: master
+    targetRevision: main
   syncPolicy:
     automated:
       prune: true
