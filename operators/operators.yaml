@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   namespace: openshift-gitops
-  name: aiops-operators
+  name: noi-operators
   annotations:
     argocd.argoproj.io/sync-wave: "100"
 spec:
