@@ -1,7 +1,7 @@
 resources:
   - namespaces/namespaces.yaml
   - operators/operators.yaml
-  #- instances/instances.yaml
+  - instances/instances.yaml
   #- ci/s2i-ace-gradle.yaml
   #- ci/pipelines.yaml
   #- ci/sonarqube.yaml
