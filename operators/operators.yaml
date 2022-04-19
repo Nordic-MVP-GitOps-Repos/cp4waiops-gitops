@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  namespace: openshift-gitops
+  name: aiops-operators
+  annotations:
+    argocd.argoproj.io/sync-wave: "100"
+spec:
+  destination:
+    namespace: openshift-gitops
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: https://github.com/Nordic-MVP-GitOps-Repos/cp4waiops-gitops 
+    path: operators/resources
+    targetRevision: main
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
