@@ -8,6 +8,10 @@ metadata:
 spec:
   license:
     accept: true
+  advanced:
+    antiAffinity: false
+    imagePullPolicy: IfNotPresent
+    imagePullRepository: cp.icr.io/cp/noi
   ldap:
     mode: standalone
     storageSize: 1Gi
