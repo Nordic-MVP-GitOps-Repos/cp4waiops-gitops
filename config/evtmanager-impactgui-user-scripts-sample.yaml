@@ -1,0 +1,20 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: evtmanager-impactgui-user-scripts 
+  namespace: noi
+  labels:
+    hdm.ibm.com/resourceowner: evtmanagernoi-ibm-com-v1beta1
+    managedByUser: 'false'
+    app.kubernetes.io/instance: evtmanager
+    release: evtmanager
+    app.kubernetes.io/managed-by: Tiller
+    helm.sh/chart: impactgui
+    app.kubernetes.io/name: impactgui
+    hdm.ibm.com/chartversion: 1.6.4
+data:
+  my-script.sh: |
+    #
+    # User specific configuration scripts.
+    #
+    echo "Hello World - updated"
