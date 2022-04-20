@@ -21,4 +21,26 @@ spec:
   version: 1.6.4
   entitlementSecret: ibm-entitlement-key
   clusterDomain: cpi4i-classic-fra02-b3c-e7d3d93b8b317d269525bf063b24f98d-0000.eu-de.containers.appdomain.cloud
+  persistence:
+    storageSizeNCOBackup: 5Gi
+    enabled: true
+    storageSizeNCOPrimary: 5Gi
+    storageClassNCOPrimary: 'ibmc-block-gold'
+    storageSizeImpactServer: 5Gi
+    storageClassImpactServer: 'ibmc-block-gold'
+    storageClassKafka: 'ibmc-block-gold'
+    storageSizeKafka: 50Gi
+    storageClassCassandraBackup: 'ibmc-block-gold'
+    storageSizeCassandraBackup: 50Gi
+    storageClassZookeeper: 'ibmc-block-gold'
+    storageClassCouchdb: 'ibmc-block-gold'
+    storageSizeZookeeper: 5Gi
+    storageSizeCouchdb: 20Gi
+    storageClassCassandraData: 'ibmc-block-gold'
+    storageSizeCassandraData: 50Gi
+    storageClassElastic: 'ibmc-block-gold'
+    storageClassImpactGUI: 'ibmc-block-gold'
+    storageSizeImpactGUI: 5Gi
+    storageSizeElastic: 75Gi
+    storageClassNCOBackup: 'ibmc-block-gold'
   deploymentType: trial
