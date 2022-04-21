@@ -17,4 +17,4 @@ data:
     #
     # User specific configuration scripts.
     #
-    echo "Hello World - updated"
+    echo "Hello World - updated - from GitHub"
