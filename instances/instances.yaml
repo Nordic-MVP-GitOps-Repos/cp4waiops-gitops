@@ -18,3 +18,9 @@ spec:
     automated:
       prune: false
       selfHeal: true
+  # This needs to be applied after first install of event manager.
+  ignoreDifferences:
+  - group: noi.ibm.com
+    kind: NOI
+    jsonPointers:
+    - /spec/helmValuesNOI/global.service.nodePort.enable
