@@ -44,3 +44,41 @@ spec:
     storageSizeElastic: 75Gi
     storageClassNCOBackup: 'ibmc-block-gold'
   deploymentType: trial
+  topology:
+    storageClassElasticTopology: 'ibmc-block-gold'
+    storageSizeElasticTopology: 75Gi
+    storageSizeFileObserver: 5Gi
+    storageClassFileObserver: 'ibmc-block-gold'
+    iafCartridgeRequirementsName: ''
+    appDisco:
+      enabled: false
+    observers:
+      docker: true
+      taddm: false
+      servicenow: false
+      ibmcloud: true
+      alm: false
+      contrail: false
+      cienablueplanet: false
+      kubernetes: true
+      bigfixinventory: false
+      junipercso: false
+      dns: true
+      itnm: false
+      ansibleawx: false
+      ciscoaci: false
+      azure: false
+      rancher: false
+      newrelic: false
+      vmvcenter: false
+      rest: true
+      appdynamics: false
+      jenkins: false
+      zabbix: false
+      file: true
+      googlecloud: false
+      dynatrace: false
+      aws: false
+      openstack: false
+      vmwarensx: false
+    netDisco: false
