@@ -1,0 +1,8 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: evtmanager-objserv-agg-primary-config
+  namespace: noi
+data:
+  agg-p-props-append: ''
+  agg-p-sql-extensions: ''
