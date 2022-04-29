@@ -1,0 +1,114 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: config-generation
+  namespace: noi
+spec:
+  tasks:
+    - name: git-clone-configs
+      params:
+        - name: url
+          value: >-
+            https://github.com/Nordic-MVP-GitOps-Repos/cp4waiops-configuration.git
+        - name: revision
+          value: main
+        - name: submodules
+          value: 'true'
+        - name: depth
+          value: '1'
+        - name: sslVerify
+          value: 'true'
+        - name: deleteExisting
+          value: 'true'
+        - name: verbose
+          value: 'true'
+        - name: gitInitImage
+          value: >-
+            registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:af7dd5b3b1598a980f17d5f5d3d8a4b11ab4f5184677f7f17ad302baa36bd3c1
+        - name: userHome
+          value: /tekton/home
+        - name: subdirectory
+          value: configs
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: git
+    - name: create-noi-configmap
+      params:
+        - name: pathtriggers
+          value: configs/primary/agg-p-sql-extensions
+        - name: pathconfigmap
+          value: gitops/config/resources/evtmanager-objserv-agg-primary-config.yaml
+      runAfter:
+        - git-clone-gitops
+        - git-clone-configs
+      taskRef:
+        kind: Task
+        name: create-noi-configmap
+      workspaces:
+        - name: git
+          workspace: git
+    - name: git-clone-gitops
+      params:
+        - name: url
+          value: 'https://github.com/Nordic-MVP-GitOps-Repos/cp4waiops-gitops.git'
+        - name: revision
+          value: main
+        - name: submodules
+          value: 'true'
+        - name: depth
+          value: '1'
+        - name: sslVerify
+          value: 'true'
+        - name: deleteExisting
+          value: 'true'
+        - name: verbose
+          value: 'true'
+        - name: gitInitImage
+          value: >-
+            registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:af7dd5b3b1598a980f17d5f5d3d8a4b11ab4f5184677f7f17ad302baa36bd3c1
+        - name: userHome
+          value: /tekton/home
+        - name: subdirectory
+          value: gitops
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: git
+    - name: git-push-config-change
+      params:
+        - name: BASE_IMAGE
+          value: >-
+            docker.io/alpine/git:v2.26.2@sha256:23618034b0be9205d9cc0846eb711b12ba4c9b468efdd8a59aac1d7b1a23363f
+        - name: GIT_SCRIPT
+          value: >-
+            cd gitops
+
+            git add config/resources/evtmanager-objserv-agg-primary-config.yaml
+
+            git commit -m "Updated config map based on
+            $(tasks.git-clone-configs.results.commit)"
+
+            git push origin HEAD:main
+        - name: USER_HOME
+          value: /root
+        - name: VERBOSE
+          value: 'true'
+        - name: GIT_USER_NAME
+          value: <USERNAMAE>
+        - name: GIT_USER_EMAIL
+          value: test@example.com
+      runAfter:
+        - create-noi-configmap
+      taskRef:
+        kind: ClusterTask
+        name: git-cli
+      workspaces:
+        - name: source
+          workspace: git
+  workspaces:
+    - name: git
