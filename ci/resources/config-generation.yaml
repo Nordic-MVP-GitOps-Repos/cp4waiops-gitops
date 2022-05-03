@@ -2,7 +2,6 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: config-generation
-  namespace: noi
 spec:
   tasks:
     - name: git-clone-configs
@@ -35,6 +34,8 @@ spec:
       workspaces:
         - name: output
           workspace: git
+        - name: basic-auth
+          workspace: basic-auth
     - name: create-noi-configmap
       params:
         - name: pathtriggers
@@ -79,6 +80,8 @@ spec:
       workspaces:
         - name: output
           workspace: git
+        - name: basic-auth
+          workspace: basic-auth
     - name: git-push-config-change
       params:
         - name: BASE_IMAGE
@@ -99,7 +102,7 @@ spec:
         - name: VERBOSE
           value: 'true'
         - name: GIT_USER_NAME
-          value: <USERNAMAE>
+          value: <USERNAME>
         - name: GIT_USER_EMAIL
           value: test@example.com
       runAfter:
@@ -110,5 +113,34 @@ spec:
       workspaces:
         - name: source
           workspace: git
+        - name: basic-auth
+          workspace: basic-auth
+    - name: oc-rollout-restart
+      params:
+        - name: SCRIPT
+          value: oc rollout restart statefulset/evtmanager-ncoprimary
+        - name: VERSION
+          value: latest
+      runAfter:
+        - argocd-task-sync-and-wait
+      taskRef:
+        kind: ClusterTask
+        name: openshift-client
+    - name: argocd-task-sync-and-wait
+      params:
+        - name: application-name
+          value: noi-config
+        - name: revision
+          value: main
+        - name: flags
+          value: '--'
+        - name: argocd-version
+          value: v2.2.5
+      runAfter:
+        - git-push-config-change
+      taskRef:
+        kind: Task
+        name: argocd-task-sync-and-wait
   workspaces:
     - name: git
+    - name: basic-auth
