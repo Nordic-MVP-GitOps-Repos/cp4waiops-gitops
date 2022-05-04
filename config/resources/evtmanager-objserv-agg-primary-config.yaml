@@ -5,14 +5,8 @@ metadata:
   namespace: noi
 data:
   agg-p-props-append: ''
-  agg-p-sql-extensions: |2
-     -- create a custom db
-      create database mydb;
-      go
-     -- create a custom table now
-      create table mydb.mytable persistent
-      (
-      col1 incr primary key,
-      col2 varchar(255)
-      );
-      go
+  agg-p-sql-extensions: |
+    create database mydb;
+    go
+    ALTER TABLE alerts.status ADD new_column VARCHAR(50);
+    GO
