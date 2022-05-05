@@ -4,7 +4,8 @@ metadata:
   name: evtmanager-objserv-agg-primary-config
   namespace: noi
 data:
-  agg-p-props-append: ''
+  agg-p-props-append: |
+    Connections 256
   agg-p-sql-extensions: |
     create database mydb;
     go
