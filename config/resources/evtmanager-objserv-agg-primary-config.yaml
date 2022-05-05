@@ -11,9 +11,3 @@ data:
     go
     ALTER TABLE alerts.status ADD new_column VARCHAR(50);
     GO
-primary:
-  agg-p-props-append: |
-    create database mydb;
-    go
-    ALTER TABLE alerts.status ADD new_column VARCHAR(50);
-    GO
