@@ -111,7 +111,6 @@ spec:
           value: $(params.git_user_email)
       runAfter:
         - validate-properties-file
-        - sqlfluff
       taskRef:
         kind: ClusterTask
         name: git-cli
@@ -138,7 +137,7 @@ spec:
         - name: VERSION
           value: latest
       runAfter:
-        - sqlfluff
+        - merge-files-into-manifest
       taskRef:
         kind: ClusterTask
         name: openshift-client
@@ -268,22 +267,6 @@ spec:
         name: openshift-client
       workspaces:
         - name: manifest-dir
-          workspace: git
-    - name: sqlfluff
-      params:
-        - name: arguments
-          value: >-
-            parse --dialect tsql - <
-            $(workspaces.input.path)/merged/agg-p-sql-extensions
-        - name: version
-          value: latest
-      runAfter:
-        - merge-files-into-manifest
-      taskRef:
-        kind: Task
-        name: sqlfluff
-      workspaces:
-        - name: input
           workspace: git
   workspaces:
     - name: git
