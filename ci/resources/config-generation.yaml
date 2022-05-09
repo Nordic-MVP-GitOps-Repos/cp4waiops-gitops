@@ -111,6 +111,7 @@ spec:
           value: $(params.git_user_email)
       runAfter:
         - validate-properties-file
+        - sqlfluff
       taskRef:
         kind: ClusterTask
         name: git-cli
@@ -137,7 +138,7 @@ spec:
         - name: VERSION
           value: latest
       runAfter:
-        - merge-files-into-manifest
+        - sqlfluff
       taskRef:
         kind: ClusterTask
         name: openshift-client
