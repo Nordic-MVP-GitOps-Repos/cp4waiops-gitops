@@ -111,6 +111,7 @@ spec:
           value: $(params.git_user_email)
       runAfter:
         - validate-properties-file
+        - oc-noi-sql-exec
       taskRef:
         kind: ClusterTask
         name: git-cli
