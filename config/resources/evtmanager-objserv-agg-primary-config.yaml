@@ -4,10 +4,10 @@ metadata:
   name: evtmanager-objserv-agg-primary-config
   namespace: noi
 data:
+  agg-p-props-append: |
+    Connections: 512
   agg-p-sql-extensions: |
     create database mydb;
     go
     ALTER TABLE alerts.status ADD new_column VARCHAR(50);
     GO
-  agg-p-props-append: |
-    Connections: 512
