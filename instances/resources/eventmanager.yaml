@@ -45,6 +45,7 @@ spec:
     storageClassNCOBackup: 'ibmc-block-gold'
   deploymentType: trial
   topology:
+    enabled: true
     storageClassElasticTopology: 'ibmc-block-gold'
     storageSizeElasticTopology: 75Gi
     storageSizeFileObserver: 5Gi
