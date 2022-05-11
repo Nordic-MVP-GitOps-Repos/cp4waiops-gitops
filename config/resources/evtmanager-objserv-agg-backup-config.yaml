@@ -1,0 +1,12 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: evtmanager-objserv-agg-backup-config
+data:
+  agg-b-props-append: |
+    BackupObjectServer: TRUE
+  agg-b-sql-extensions: ''
+  agg-gate-map-replace: ''
+  agg-gate-props-append: ''
+  agg-gate-startup-cmd-replace: ''
+  agg-gate-tblrep-def-replace: ''
