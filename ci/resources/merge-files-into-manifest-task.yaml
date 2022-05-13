@@ -4,25 +4,31 @@ metadata:
   name: merge-files-into-manifest
 spec:
   params:
-    - description: the path of the files to be merged into yaml manifest. directories will be field names, files will be merged as values
+    - description: >-
+        the path of the files to be merged into yaml manifest. directories will
+        be field names, files will be merged as values
       name: pathfiles
       type: string
     - description: the path of the yaml manifest
       name: pathmanifest
       type: string
-    - name: yq-version
+    - default: 4.24.5
+      name: yq-version
       type: string
-      default: '4.24.5'
   steps:
     - image: 'docker.io/mikefarah/yq:$(params.yq-version)'
       name: merge-files
       resources: {}
       script: |
         function traverse() {
-          mergedfile=$(basename $1)
-          yamlpath=$2'.'$mergedfile
+          local mergedfile=$(basename $1)
+          local yamlpath=$2'.'$mergedfile
           echo -n "" > $(workspaces.inputoutput.path)/merged/$mergedfile
-          for file in $1/*
+          local scandir=$1
+          if [ -f "$1/.mergepath" ]; then
+            scandir=$1/$(cat $1/.mergepath)
+          fi
+          for file in $scandir/*
           do
               if [ ! -d "${file}" ] ; then
                   echo "${file} is a file"
@@ -34,7 +40,7 @@ spec:
           done
           if [ -s $(workspaces.inputoutput.path)/merged/$mergedfile ]; then
             sed -i 's/\s*$//g' $(workspaces.inputoutput.path)/merged/$mergedfile
-            cat $(workspaces.inputoutput.path)/merged/$mergedfile
+            #cat $(workspaces.inputoutput.path)/merged/$mergedfile
             yq -i 'del('$yamlpath')' $(workspaces.inputoutput.path)/$(params.pathmanifest)
             yq -i $yamlpath' = load_str("$(workspaces.inputoutput.path)/merged/'$mergedfile'")' $(workspaces.inputoutput.path)/$(params.pathmanifest) 
           else
