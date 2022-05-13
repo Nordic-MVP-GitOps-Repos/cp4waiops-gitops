@@ -5,7 +5,7 @@ metadata:
   namespace: noi
 data:
   agg-p-props-append: |
-    Connections: 512
+    Connections: 256
   agg-p-sql-extensions: |
     create database mydb;
     go
