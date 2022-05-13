@@ -83,24 +83,19 @@ spec:
           value: >-
             docker.io/alpine/git:v2.26.2@sha256:23618034b0be9205d9cc0846eb711b12ba4c9b468efdd8a59aac1d7b1a23363f
         - name: GIT_SCRIPT
-          value: >+
+          value: >
             cd gitops
 
-
-            if [[ $(git status -uno --porcelain | wc -l) -eq 0 ]] 
-
-            then 
+            if [[ $(git status -uno --porcelain | wc -l) -eq 0 ]];  then 
                 exit 0
             fi
 
-
-            git add config/resources/evtmanager-objserv-agg-primary-config.yaml
+            git add -u .
 
             git commit -m "Updated config map based on
             $(tasks.git-clone-configs.results.commit)"
 
             git push origin HEAD:main
-
         - name: USER_HOME
           value: /root
         - name: VERBOSE
@@ -110,8 +105,10 @@ spec:
         - name: GIT_USER_EMAIL
           value: $(params.git_user_email)
       runAfter:
-        - validate-properties-file
-        - oc-noi-sql-exec
+        - primary-validate-properties-file
+        - primary-oc-noi-sql-exec
+        - backup-validate-properties-file
+        - backup-oc-noi-sql-exec
       taskRef:
         kind: ClusterTask
         name: git-cli
@@ -120,10 +117,10 @@ spec:
           workspace: git
         - name: basic-auth
           workspace: basic-auth
-    - name: oc-noi-sql-exec
+    - name: primary-oc-noi-sql-exec
       params:
         - name: SCRIPT
-          value: >+
+          value: >
             oc exec evtmanager-ncoprimary-0 -- mkdir -p /home/netcool/tekton
 
             oc rsync --include=agg-p-sql-extensions --strategy=rsync
@@ -134,18 +131,17 @@ spec:
             '/opt/IBM/tivoli/netcool/omnibus/bin/nco_sql -server AGG_P -user
             root -password $OMNIBUS_ROOT_PWD <
             /home/netcool/tekton/agg-p-sql-extensions'
-
         - name: VERSION
           value: latest
       runAfter:
-        - merge-files-into-manifest
+        - primary-merge-files-into-manifest
       taskRef:
         kind: ClusterTask
         name: openshift-client
       workspaces:
         - name: manifest-dir
           workspace: git
-    - name: merge-files-into-manifest
+    - name: primary-merge-files-into-manifest
       params:
         - name: pathfiles
           value: configs/primary/data
@@ -168,33 +164,19 @@ spec:
           value: >
             cat <<'EOF' >
             $(workspaces.manifest-dir.path)/configs/nci/policies/syntaxcheck.sh
-
-            #!/usr/bin/bash -e
-
-            for file in /home/netcool/tekton/*.ipl
-
-            do
+            #!/usr/bin/bash -e for file in /home/netcool/tekton/*.ipl do
               echo "Processing ${file}"
               /opt/IBM/tivoli/impact/bin/nci_policy NCI_0 syntax $file > /home/netcool/tekton/output.txt
               cat /home/netcool/tekton/output.txt
               errorcount=$(cat /home/netcool/tekton/output.txt | sed -n "/ERROR/p" | wc -l)
               test $errorcount = 0
-            done
-
-            EOF
-
-            chmod +x
+            done EOF chmod +x
             $(workspaces.manifest-dir.path)/configs/nci/policies/syntaxcheck.sh
-
             oc exec -c nciserver evtmanager-nciserver-0 -- mkdir -p
-            /home/netcool/tekton
-
-            oc rsync -c nciserver --strategy=tar
+            /home/netcool/tekton oc rsync -c nciserver --strategy=tar
             $(workspaces.manifest-dir.path)/configs/nci/policies/
-            evtmanager-nciserver-0:/home/netcool/tekton
-
-            oc exec -c nciserver evtmanager-nciserver-0 --
-            /home/netcool/tekton/syntaxcheck.sh
+            evtmanager-nciserver-0:/home/netcool/tekton oc exec -c nciserver
+            evtmanager-nciserver-0 -- /home/netcool/tekton/syntaxcheck.sh
         - name: VERSION
           value: latest
       runAfter:
@@ -211,30 +193,16 @@ spec:
           value: >-
             cat <<'EOF' >
             $(workspaces.manifest-dir.path)/configs/nci/policies/updatepolicies.sh
-
-            #!/usr/bin/bash -e
-
-            for file in /home/netcool/tekton/*.ipl
-
-            do
+            #!/usr/bin/bash -e for file in /home/netcool/tekton/*.ipl do
               echo "Processing ${file}"
               /opt/IBM/tivoli/impact/bin/nci_policy NCI_0 push impactadmin $IMPACT_ADMIN_PASSWORD $file
-            done
-
-            EOF
-
-            chmod +x
+            done EOF chmod +x
             $(workspaces.manifest-dir.path)/configs/nci/policies/updatepolicies.sh
-
             oc exec -c nciserver evtmanager-nciserver-0 -- mkdir -p
-            /home/netcool/tekton
-
-            oc rsync -c nciserver --strategy=tar
+            /home/netcool/tekton oc rsync -c nciserver --strategy=tar
             $(workspaces.manifest-dir.path)/configs/nci/policies/
-            evtmanager-nciserver-0:/home/netcool/tekton
-
-            oc exec -c nciserver evtmanager-nciserver-0 --
-            /home/netcool/tekton/updatepolicies.sh
+            evtmanager-nciserver-0:/home/netcool/tekton oc exec -c nciserver
+            evtmanager-nciserver-0 -- /home/netcool/tekton/updatepolicies.sh
         - name: VERSION
           value: latest
       runAfter:
@@ -245,7 +213,7 @@ spec:
       workspaces:
         - name: manifest-dir
           workspace: git
-    - name: validate-properties-file
+    - name: primary-validate-properties-file
       params:
         - name: SCRIPT
           value: |-
@@ -262,7 +230,73 @@ spec:
         - name: VERSION
           value: latest
       runAfter:
-        - merge-files-into-manifest
+        - primary-merge-files-into-manifest
+      taskRef:
+        kind: ClusterTask
+        name: openshift-client
+      workspaces:
+        - name: manifest-dir
+          workspace: git
+    - name: backup-merge-files-into-manifest
+      params:
+        - name: pathfiles
+          value: configs/backup/data
+        - name: pathmanifest
+          value: gitops/config/resources/evtmanager-objserv-agg-backup-config.yaml
+        - name: yq-version
+          value: 4.24.5
+      runAfter:
+        - git-clone-configs
+        - git-clone-gitops
+      taskRef:
+        kind: Task
+        name: merge-files-into-manifest
+      workspaces:
+        - name: inputoutput
+          workspace: git
+    - name: backup-validate-properties-file
+      params:
+        - name: SCRIPT
+          value: |-
+            #!/bin/bash
+            while IFS= read -r line
+            do
+              echo "$line" | grep -q ":"  
+              if [[ $? -eq 1 ]]
+              then 
+                echo "Missing colon on line \"$line\""
+                exit 1
+              fi
+            done < "$(workspaces.manifest-dir.path)/merged/agg-b-props-append"
+        - name: VERSION
+          value: latest
+      runAfter:
+        - backup-merge-files-into-manifest
+      taskRef:
+        kind: ClusterTask
+        name: openshift-client
+      workspaces:
+        - name: manifest-dir
+          workspace: git
+    - name: backup-oc-noi-sql-exec
+      params:
+        - name: SCRIPT
+          value: >
+            oc exec evtmanager-ncobackup-0 -c ncobackup-agg-b -- mkdir -p
+            /home/netcool/tekton
+
+            oc rsync -c ncobackup-agg-b --include=agg-b-sql-extensions
+            --strategy=rsync $(workspaces.manifest-dir.path)/merged/
+            evtmanager-ncobackup-0:/home/netcool/tekton
+
+            oc exec evtmanager-ncobackup-0 -c ncobackup-agg-b -- bash -c
+            '/opt/IBM/tivoli/netcool/omnibus/bin/nco_sql -server AGG_B -user
+            root -password $OMNIBUS_ROOT_PWD <
+            /home/netcool/tekton/agg-b-sql-extensions'
+        - name: VERSION
+          value: latest
+      runAfter:
+        - backup-merge-files-into-manifest
       taskRef:
         kind: ClusterTask
         name: openshift-client
