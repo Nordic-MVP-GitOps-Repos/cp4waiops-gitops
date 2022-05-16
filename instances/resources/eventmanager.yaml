@@ -72,7 +72,7 @@ spec:
       newrelic: false
       vmvcenter: false
       rest: true
-      appdynamics: false
+      appdynamics: true
       jenkins: false
       zabbix: false
       file: true
