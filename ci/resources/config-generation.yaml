@@ -321,6 +321,4 @@ spec:
           workspace: git
   workspaces:
     - name: git
-      optional: false
     - name: basic-auth
-      optional: false
