@@ -4,4 +4,4 @@ resources:
   - instances/instances.yaml
   - config/config.yaml
   - ci/ci.yaml
-
+  - ci/runbooksync.yaml
