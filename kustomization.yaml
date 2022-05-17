@@ -3,5 +3,5 @@ resources:
   - operators/operators.yaml
   - instances/instances.yaml
   - config/config.yaml
-# - ci/ci.yaml
+  - ci/ci.yaml
 
