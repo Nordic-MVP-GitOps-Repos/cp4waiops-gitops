@@ -303,6 +303,24 @@ spec:
       workspaces:
         - name: manifest-dir
           workspace: git
+    - name: import-noi-runbooks
+      runAfter:
+        - git-clone-configs
+      taskRef:
+        kind: Task
+        name: import-noi-runbooks
+      params:
+        - name: params
+          value: '--publish'
+        - name: runbookspath
+          value: configs/runbooks
+        - name: noi-secret
+          value: runbook-pipeline-secret
+      workspaces:
+        - name: runbooks
+          workspace: git
   workspaces:
     - name: git
+      optional: false
     - name: basic-auth
+      optional: false
