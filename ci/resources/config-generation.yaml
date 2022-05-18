@@ -161,7 +161,7 @@ spec:
     - name: oc-nci-check-syntax-policies
       params:
         - name: SCRIPT
-          value: >
+          value: |
             cat <<'EOF' >
             $(workspaces.manifest-dir.path)/configs/nci/policies/syntaxcheck.sh
             #!/usr/bin/bash -e for file in /home/netcool/tekton/*.ipl do
@@ -170,13 +170,11 @@ spec:
               cat /home/netcool/tekton/output.txt
               errorcount=$(cat /home/netcool/tekton/output.txt | sed -n "/ERROR/p" | wc -l)
               test $errorcount = 0
-            done EOF chmod +x
-            $(workspaces.manifest-dir.path)/configs/nci/policies/syntaxcheck.sh
-            oc exec -c nciserver evtmanager-nciserver-0 -- mkdir -p
-            /home/netcool/tekton oc rsync -c nciserver --strategy=tar
-            $(workspaces.manifest-dir.path)/configs/nci/policies/
-            evtmanager-nciserver-0:/home/netcool/tekton oc exec -c nciserver
-            evtmanager-nciserver-0 -- /home/netcool/tekton/syntaxcheck.sh
+            done EOF
+            chmod +x $(workspaces.manifest-dir.path)/configs/nci/policies/syntaxcheck.sh
+            oc exec -c nciserver evtmanager-nciserver-0 -- mkdir -p /home/netcool/tekton
+            oc rsync -c nciserver --strategy=tar $(workspaces.manifest-dir.path)/configs/nci/policies/ evtmanager-nciserver-0:/home/netcool/tekton
+            oc exec -c nciserver evtmanager-nciserver-0 -- /home/netcool/tekton/syntaxcheck.sh
         - name: VERSION
           value: latest
       runAfter:
@@ -190,19 +188,17 @@ spec:
     - name: oc-nci-update-policies
       params:
         - name: SCRIPT
-          value: >-
+          value: |
             cat <<'EOF' >
             $(workspaces.manifest-dir.path)/configs/nci/policies/updatepolicies.sh
             #!/usr/bin/bash -e for file in /home/netcool/tekton/*.ipl do
               echo "Processing ${file}"
               /opt/IBM/tivoli/impact/bin/nci_policy NCI_0 push impactadmin $IMPACT_ADMIN_PASSWORD $file
-            done EOF chmod +x
-            $(workspaces.manifest-dir.path)/configs/nci/policies/updatepolicies.sh
-            oc exec -c nciserver evtmanager-nciserver-0 -- mkdir -p
-            /home/netcool/tekton oc rsync -c nciserver --strategy=tar
-            $(workspaces.manifest-dir.path)/configs/nci/policies/
-            evtmanager-nciserver-0:/home/netcool/tekton oc exec -c nciserver
-            evtmanager-nciserver-0 -- /home/netcool/tekton/updatepolicies.sh
+            done EOF
+            chmod +x $(workspaces.manifest-dir.path)/configs/nci/policies/updatepolicies.sh
+            oc exec -c nciserver evtmanager-nciserver-0 -- mkdir -p /home/netcool/tekton
+            oc rsync -c nciserver --strategy=tar $(workspaces.manifest-dir.path)/configs/nci/policies/ evtmanager-nciserver-0:/home/netcool/tekton
+            oc exec -c nciserver evtmanager-nciserver-0 -- /home/netcool/tekton/updatepolicies.sh
         - name: VERSION
           value: latest
       runAfter:
