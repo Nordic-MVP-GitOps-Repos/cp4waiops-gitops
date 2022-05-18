@@ -70,7 +70,7 @@ spec:
       azure: false
       rancher: false
       newrelic: false
-      vmvcenter: false
+      vmvcenter: true
       rest: true
       appdynamics: true
       jenkins: false
