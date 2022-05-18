@@ -6,7 +6,7 @@ metadata:
 subjects:
   - kind: Group
     apiGroup: rbac.authorization.k8s.io
-    name: 'system:serviceaccounts:weave'
+    name: 'system:serviceaccounts:weave-scope'
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
