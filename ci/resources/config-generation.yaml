@@ -162,8 +162,7 @@ spec:
       params:
         - name: SCRIPT
           value: |
-            cat <<'EOF' >
-            $(workspaces.manifest-dir.path)/configs/nci/policies/syntaxcheck.sh
+            cat <<'EOF' > $(workspaces.manifest-dir.path)/configs/nci/policies/syntaxcheck.sh
             #!/usr/bin/bash -e for file in /home/netcool/tekton/*.ipl do
               echo "Processing ${file}"
               /opt/IBM/tivoli/impact/bin/nci_policy NCI_0 syntax $file > /home/netcool/tekton/output.txt
@@ -190,8 +189,7 @@ spec:
       params:
         - name: SCRIPT
           value: |
-            cat <<'EOF' >
-            $(workspaces.manifest-dir.path)/configs/nci/policies/updatepolicies.sh
+            cat <<'EOF' > $(workspaces.manifest-dir.path)/configs/nci/policies/updatepolicies.sh
             #!/usr/bin/bash -e for file in /home/netcool/tekton/*.ipl do
               echo "Processing ${file}"
               /opt/IBM/tivoli/impact/bin/nci_policy NCI_0 push impactadmin $IMPACT_ADMIN_PASSWORD $file
