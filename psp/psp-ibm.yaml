@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  namespace: openshift-gitops
+  name: ibm-psp
+  annotations:
+    argocd.argoproj.io/sync-wave: "200"
+spec:
+  destination:
+    namespace: openshift-gitops
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: https://github.com/IBM/cloud-pak
+    path: spec/security/psp
+    targetRevision: master
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      
