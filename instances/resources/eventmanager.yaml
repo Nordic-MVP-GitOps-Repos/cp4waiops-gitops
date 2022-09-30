@@ -18,7 +18,7 @@ spec:
     storageClass: 'ibmc-block-gold'
   backupRestore:
     enableAnalyticsBackups: false
-  version: 1.6.4
+  version: 1.6.5
   entitlementSecret: ibm-entitlement-key
   clusterDomain: cpi4i-classic-fra02-b3c-e7d3d93b8b317d269525bf063b24f98d-0000.eu-de.containers.appdomain.cloud
   persistence:
