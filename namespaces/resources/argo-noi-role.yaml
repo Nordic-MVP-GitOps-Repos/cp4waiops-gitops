@@ -1,0 +1,11 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: argo-noi-role
+rules:
+  - verbs:
+      - '*'
+    apiGroups:
+      - noi.ibm.com
+    resources:
+      - '*'
