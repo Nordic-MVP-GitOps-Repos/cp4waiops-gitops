@@ -1,0 +1,120 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  creationTimestamp: '2022-05-16T14:40:23Z'
+  generation: 8
+  managedFields:
+    - apiVersion: tekton.dev/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:spec':
+          .: {}
+          'f:finally': {}
+          'f:params': {}
+          'f:resources': {}
+          'f:tasks': {}
+          'f:workspaces': {}
+      manager: Mozilla
+      operation: Update
+      time: '2022-05-16T14:42:01Z'
+  name: export-runbooks
+  namespace: noi
+  resourceVersion: '845307343'
+  uid: b8c25e1c-5bf3-4b7b-abe7-e6f2ff1b87d2
+spec:
+  params:
+    - description: The git username
+      name: git-user
+      type: string
+    - description: The git user email
+      name: git-email
+      type: string
+  tasks:
+    - name: export-noi-runbooks
+      params:
+        - name: params
+          value: '--splithtml'
+        - name: runbookspath
+          value: configs/runbooks
+        - name: noi-secret
+          value: runbook-pipeline-secret
+      runAfter:
+        - git-clone
+      taskRef:
+        kind: Task
+        name: export-noi-runbooks
+      workspaces:
+        - name: runbooks
+          workspace: git
+    - name: git-clone
+      params:
+        - name: url
+          value: >-
+            https://github.com/Nordic-MVP-GitOps-Repos/cp4waiops-configuration.git
+        - name: revision
+          value: main
+        - name: submodules
+          value: 'true'
+        - name: depth
+          value: '1'
+        - name: sslVerify
+          value: 'true'
+        - name: deleteExisting
+          value: 'true'
+        - name: verbose
+          value: 'true'
+        - name: gitInitImage
+          value: >-
+            registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:af7dd5b3b1598a980f17d5f5d3d8a4b11ab4f5184677f7f17ad302baa36bd3c1
+        - name: userHome
+          value: /tekton/home
+        - name: subdirectory
+          value: configs
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: git
+        - name: basic-auth
+          workspace: git-basic-auth
+    - name: git-cli
+      params:
+        - name: BASE_IMAGE
+          value: >-
+            docker.io/alpine/git:v2.26.2@sha256:23618034b0be9205d9cc0846eb711b12ba4c9b468efdd8a59aac1d7b1a23363f
+        - name: GIT_USER_NAME
+          value: $(params.git-user)
+        - name: GIT_USER_EMAIL
+          value: $(params.git-email)
+        - name: GIT_SCRIPT
+          value: >
+            cd configs
+
+            if [[ $(git status runbooks --porcelain | wc -l) -eq 0 ]];  then 
+                exit 0
+            fi
+
+            git add runbooks
+
+            git commit -m "Exported runbooks by pipeline:
+            $(context.pipeline.name)"
+
+            git push origin HEAD:main
+        - name: USER_HOME
+          value: /root
+        - name: VERBOSE
+          value: 'true'
+      runAfter:
+        - export-noi-runbooks
+      taskRef:
+        kind: ClusterTask
+        name: git-cli
+      workspaces:
+        - name: source
+          workspace: git
+        - name: basic-auth
+          workspace: git-basic-auth
+  workspaces:
+    - name: git
+    - name: git-basic-auth
