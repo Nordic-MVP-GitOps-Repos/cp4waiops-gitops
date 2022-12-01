@@ -1,26 +1,8 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  creationTimestamp: '2022-05-16T14:40:23Z'
-  generation: 8
-  managedFields:
-    - apiVersion: tekton.dev/v1beta1
-      fieldsType: FieldsV1
-      fieldsV1:
-        'f:spec':
-          .: {}
-          'f:finally': {}
-          'f:params': {}
-          'f:resources': {}
-          'f:tasks': {}
-          'f:workspaces': {}
-      manager: Mozilla
-      operation: Update
-      time: '2022-05-16T14:42:01Z'
   name: export-runbooks
   namespace: noi
-  resourceVersion: '845307343'
-  uid: b8c25e1c-5bf3-4b7b-abe7-e6f2ff1b87d2
 spec:
   params:
     - description: The git username
