@@ -2,7 +2,7 @@ resources:
   - namespaces/namespaces.yaml
   - operators/operators.yaml
   - instances/instances.yaml
-  - config/config.yaml
+  #- config/config.yaml
   - ci/ci.yaml
   - ci/runbooksync.yaml
   - psp/psp-ibm.yaml
